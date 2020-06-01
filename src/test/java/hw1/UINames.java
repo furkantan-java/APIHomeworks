@@ -55,12 +55,12 @@ public class UINames {
 //2. Verify status code 200, content type application/json; charset=utf-8
 //3. Verify that value of gender field is same from step 1
 
-    private final List<String> genders = Arrays.asList("male","female");
+    private final List<String> genders = Arrays.asList("male","female");//We will pick random gender for each execution
     @Test
     @DisplayName("Gender test")
     public void genderTest() {
-        Collections.shuffle(genders);
-        String gender = genders.get(0);
+        Collections.shuffle(genders);//to change order of our list
+        String gender = genders.get(0);//because of shuffling our index can change and we can pick random gender
         System.out.println("Sending gender as = " + gender);
         Response response =
                 given().
