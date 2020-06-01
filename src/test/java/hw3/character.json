@@ -1,0 +1,14 @@
+{
+    "_id": "5a0fa4daae5bc100213c232e",
+    "name": "Hannah Abbott",
+    "role": "student",
+    "house": "Hufflepuff",
+    "school": "Hogwarts School of Witchcraft and Wizardry",
+    "__v": 0,
+    "ministryOfMagic": false,
+    "orderOfThePhoenix": false,
+    "dumbledoresArmy": true,
+    "deathEater": false,
+    "bloodStatus": "half-blood",
+    "species": "human"
+}
