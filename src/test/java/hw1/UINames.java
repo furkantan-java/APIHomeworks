@@ -1,5 +1,12 @@
 package hw1;
 
+import static io.restassured.RestAssured.*;
+
+import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 public class UINames {
 
 //    UI names API testing
@@ -9,13 +16,27 @@ public class UINames {
 //    Automate the given test cases. You can use any existing project. You can automate all test cases in
 //    same class or different classes.
 
-
+    @BeforeAll
+    public static void beforeAll(){
+        baseURI = "https://cybertek-ui-names.herokuapp.com/api/";
+    }
 //    TEST CASES
 //    No params test
 //1. Send a get request without providing any parameters
 //2. Verify status code 200, content type application/json; charset=utf-8
-//            3. Verify that name, surname, gender, region fields have value
+//3. Verify that name, surname, gender, region fields have value
 
+    @Test
+    @DisplayName("No params test")
+    public void noParams(){
+        Response response = when().get().prettyPeek();
+
+        response.then().
+                assertThat().
+                        statusCode(200).
+                and().
+                        contentType("application/json; charset=utf-8");
+    }
 
 //    Gender test
 //1. Create a request by providing query parameter: gender, male or female
