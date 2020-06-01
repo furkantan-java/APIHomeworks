@@ -1,6 +1,8 @@
 package hw1;
 
 import static io.restassured.RestAssured.*;
+import static org.hamcrest.Matchers.*;
+
 
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,13 +37,18 @@ public class UINames {
                 assertThat().
                         statusCode(200).
                 and().
-                        contentType("application/json; charset=utf-8");
+                        contentType("application/json; charset=utf-8").
+                and().
+                        body("name", notNullValue()).
+                        body("surname",notNullValue()).
+                        body("gender",notNullValue()).
+                        body("region",notNullValue());
     }
 
 //    Gender test
 //1. Create a request by providing query parameter: gender, male or female
 //2. Verify status code 200, content type application/json; charset=utf-8
-//            3. Verify that value of gender field is same from step 1
+//3. Verify that value of gender field is same from step 1
 
 
 //     2 params test
