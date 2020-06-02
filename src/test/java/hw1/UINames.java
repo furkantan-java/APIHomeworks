@@ -164,7 +164,7 @@ public class UINames {
         Response response =
                 given().
                         queryParams("region","Argentina").
-                        queryParams("amount",300).
+                        queryParams("amount",10).
                 when().
                         get().prettyPeek();
 
@@ -256,7 +256,19 @@ public class UINames {
     @Test
     @DisplayName("Amount count test")
     public void amountCount() {
+        System.out.println("randomAmount = " + randomAmount);
         Response response =
+                given().
+                        queryParams("amount",randomAmount).
+                when().
+                        get().prettyPeek();
 
+        response.then().
+                assertThat().
+                        statusCode(200).
+                and().
+                        contentType("application/json; charset=utf-8").
+                and().
+                        body("size()",is(randomAmount));
     }
 }
