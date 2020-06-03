@@ -1,5 +1,6 @@
 package hw3.pojos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -190,6 +191,7 @@ import java.util.List;
  */
 public class HPHouse {
     @SerializedName("_id")
+    @JsonProperty("_id")
     private String id;
     private String name;
     private String mascot;
@@ -197,11 +199,26 @@ public class HPHouse {
     private String houseGhost;
     private String founder;
     @SerializedName("__v")
+    @JsonProperty("__v")
     private Integer v;
     private String school;
     private List<HPMember> members;
     private List<String>values;
     private List<String>colors;
+
+    public HPHouse(String id, String name, String mascot, String headOfHouse, String houseGhost, String founder, Integer v, String school, List<HPMember> members, List<String> values, List<String> colors) {
+        this.id = id;
+        this.name = name;
+        this.mascot = mascot;
+        this.headOfHouse = headOfHouse;
+        this.houseGhost = houseGhost;
+        this.founder = founder;
+        this.v = v;
+        this.school = school;
+        this.members = members;
+        this.values = values;
+        this.colors = colors;
+    }
 
     @Override
     public String toString() {
