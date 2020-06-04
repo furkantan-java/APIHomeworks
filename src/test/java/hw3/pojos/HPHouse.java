@@ -1,7 +1,5 @@
 package hw3.pojos;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -190,7 +188,7 @@ import java.util.List;
  *     ]
  * }
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
+
 public class HPHouse {
     @SerializedName("_id")
     private String id;
@@ -202,11 +200,11 @@ public class HPHouse {
     @SerializedName("__v")
     private Integer v;
     private String school;
-    private List<HPMember> members;
+    private List<String> members;
     private List<String>values;
     private List<String>colors;
 
-    public HPHouse(String id, String name, String mascot, String headOfHouse, String houseGhost, String founder, Integer v, String school, List<HPMember> members, List<String> values, List<String> colors) {
+    public HPHouse(String id, String name, String mascot, String headOfHouse, String houseGhost, String founder, Integer v, String school, List<String> members, List<String> values, List<String> colors) {
         this.id = id;
         this.name = name;
         this.mascot = mascot;
@@ -301,11 +299,11 @@ public class HPHouse {
         this.school = school;
     }
 
-    public List<HPMember> getMembers() {
+    public List<String> getMembers() {
         return members;
     }
 
-    public void setMembers(List<HPMember> members) {
+    public void setMembers(List<String> members) {
         this.members = members;
     }
 

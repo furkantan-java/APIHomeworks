@@ -2,9 +2,10 @@ package hw3;
 
 import static io.restassured.RestAssured.*;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import hw3.pojos.HPCharacter;
+import hw3.pojos.HPHouse;
+import hw3.pojos.HPMember;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.http.ContentType;
 import io.restassured.mapper.ObjectMapperType;
@@ -26,7 +27,7 @@ public class HarryPotterAPI {
     @BeforeAll
     public static void beforeAll() {
         baseURI = "https://www.potterapi.com/v1";
-        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        //new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     }
 
@@ -51,7 +52,7 @@ public class HarryPotterAPI {
 
 
 //    Verify sorting hat
-//1. Send a get request to /sortingHat. Request includes :
+//              1. Send a get request to /sortingHat. Request includes :
 //            2. Verify status code 200, content type application/json; charset=utf-8
 //            3. Verify that response body contains one of the following houses:
 //            "Gryffindor", "Ravenclaw", "Slytherin", "Hufflepuff"
@@ -151,6 +152,8 @@ public class HarryPotterAPI {
         List<HPCharacter>characterList = response.jsonPath().getList("",HPCharacter.class);
 
         System.out.println("characterList = " + characterList);
+
+        System.out.println("characterList.size() = " + characterList.size());
         
         assertTrue(characterList.size() == 195);
     }
@@ -160,7 +163,7 @@ public class HarryPotterAPI {
 //            • Header Accept with value application/json
 //              • Query param key with value {{apiKey}}
 //2. Verify status code 200, content type application/json; charset=utf-8
-//            3. Verify all characters in the response have id field which is not empty
+//3. Verify all characters in the response have id field which is not empty
 //4. Verify that value type of the field dumbledoresArmy is a boolean in all characters in the response
 //5. Verify value of the house in all characters in the response is one of the following:
 //            "Gryffindor", "Ravenclaw", "Slytherin", "Hufflepuff"
@@ -174,7 +177,7 @@ public class HarryPotterAPI {
                         queryParams("key",APIKEY).
                 get("/characters").prettyPeek();
 
-        List<String>houseList = Arrays.asList("Gryffindor", "Ravenclaw", "Slytherin", "Hufflepuff");
+        List<String>houseList = Arrays.asList("Gryffindor", "Ravenclaw", "Slytherin", "Hufflepuff", null);
 
         response.then().
                 assertThat().
@@ -184,6 +187,28 @@ public class HarryPotterAPI {
                         body("dumbledoresArmy",everyItem(is(instanceOf(Boolean.class)))).
                         body("house",everyItem(is(oneOf("Gryffindor", "Ravenclaw", "Slytherin", "Hufflepuff",null))));
 
+        //2nd way
+
+        List<HPCharacter>characterList = response.jsonPath().getList("",HPCharacter.class);
+
+        System.out.println("characterList = " + characterList);
+        
+        List<HPCharacter>characterList2 = response.as(List.class);
+
+        System.out.println("characterList = " + characterList2);
+        
+        for (HPCharacter hpCharacter:characterList) {
+            //3. Verify all characters in the response have id field which is not empty
+//            assertFalse(hpCharacter.getId().isEmpty());
+//            assertTrue(!hpCharacter.getId().isEmpty());
+            //4. Verify that value type of the field dumbledoresArmy is a boolean in all characters in the response
+            assertTrue(hpCharacter.getDumbledoresArmy() instanceof Boolean);
+            //5. Verify value of the house in all characters in the response is one of the following:
+            //            "Gryffindor", "Ravenclaw", "Slytherin", "Hufflepuff"
+            assertTrue(houseList.contains(hpCharacter.getHouse()));
+            
+        }
+
     }
 
 //    Verify all character information
@@ -191,7 +216,7 @@ public class HarryPotterAPI {
 //            • Header Accept with value application/json
 //              • Query param key with value {{apiKey}}
 //2. Verify status code 200, content type application/json; charset=utf-8
-//            3. Select name of any random character
+//3. Select name of any random character
 //4. Send a get request to /characters. Request includes :
 //            • Header Accept with value application/json
 //          • Query param key with value {{apiKey}}
@@ -212,13 +237,22 @@ public class HarryPotterAPI {
                         statusCode(200).
                         contentType("application/json; charset=utf-8");
 
+        //storing response in list of map
         List<Map<String,String>>allCharacters = response.jsonPath().getList("");
 
         System.out.println("allCharacters = " + allCharacters);
+
+        //storing response in List of POJO
+        List<HPCharacter>characterList = response.jsonPath().getList("",HPCharacter.class);
         
-        int randomCharater = new Random().nextInt(allCharacters.size());
-        
+        int randomCharater = new Random().nextInt(characterList.size());
+
+
+        //with map
         String anyName = allCharacters.get(randomCharater).get("name");
+
+        //with POJO
+        String anyNameFromCharacterList = characterList.get(randomCharater).getName();
 
         System.out.println("anyName = " + anyName);
 
@@ -226,10 +260,19 @@ public class HarryPotterAPI {
                 given().
                         header("Accept","application/json").
                         queryParams("key",APIKEY).
-                        queryParam("name",anyName).
+                        queryParam("name",anyNameFromCharacterList).
                 when().
                         get("/characters").prettyPeek();
 
+        //with pojo
+        HPCharacter hpCharacter = response2.jsonPath().getObject("[0]",HPCharacter.class );
+
+        System.out.println("hpCharacter = " + hpCharacter);
+
+        assertEquals(anyNameFromCharacterList,hpCharacter.getName());
+
+
+        //without pojo
         response2.then().
                     assertThat().
                             body("[0].name",is(anyName));
@@ -243,13 +286,13 @@ public class HarryPotterAPI {
 //              • Query param key with value {{apiKey}}
 //              • Query param name with value Harry Potter
 //2. Verify status code 200, content type application/json; charset=utf-8
-//            3. Verify name Harry Potter
+//3. Verify name Harry Potter
 //4. Send a get request to /characters. Request includes :
 //            • Header Accept with value application/json
 //          • Query param key with value {{apiKey}}
 //          • Query param name with value Marry Potter
 //5. Verify status code 200, content type application/json; charset=utf-8
-//            6. Verify response body is empty
+//6. Verify response body is empty
     @Test
     @DisplayName("Verify name search")
     public void nameSearch() {
@@ -261,11 +304,15 @@ public class HarryPotterAPI {
                         queryParams("name", "Harry Potter").
                 when().
                         get("/characters").prettyPeek();
-
+        //without pojo
         response.then().assertThat().
                 statusCode(200).
                 contentType("application/json; charset=utf-8").
                 body("[0].name",is("Harry Potter"));
+
+        //with pojo
+        HPCharacter hpCharacter = response.jsonPath().getObject("[0]",HPCharacter.class);
+        assertEquals("Harry Potter",hpCharacter.getName());
 
         Response response2 =
                 given().
@@ -289,7 +336,7 @@ public class HarryPotterAPI {
 //            • Header Accept with value application/json
 //              • Query param key with value {{apiKey}}
 //2. Verify status code 200, content type application/json; charset=utf-8
-//            3. Capture the id of the Gryffindor house
+// 3. Capture the id of the Gryffindor house
 //4. Capture the ids of the all members of the Gryffindor house
 //5. Send a get request to /houses/:id. Request includes :
 //            • Header Accept with value application/json
@@ -311,6 +358,16 @@ public class HarryPotterAPI {
                     contentType("application/json; charset=utf-8");
 
         String gryffindorID = response.jsonPath().getString("find{it.name == 'Gryffindor'}_id");
+
+        //with POJO
+//        List<HPHouse>houseList = response.jsonPath().getList("",HPHouse.class);
+//        String gryffindorIDFromPOJO = "";
+//        List<String>memberIDsFromPOJO = new ArrayList<>();
+//        for (HPHouse hpHouse: houseList) {
+//            if(hpHouse.getHeadOfHouse().equals("Gryffindor")){
+//                gryffindorIDFromPOJO = hpHouse.getId();
+//            }
+//        }
 
         System.out.println("gryffindorID = " + gryffindorID);
 
@@ -358,6 +415,11 @@ public class HarryPotterAPI {
                         get("/houses/{id}").prettyPeek();
 
         List<String>memberIDs = response.jsonPath().getList("[0].members._id");
+        
+        //with POJO
+        List<HPMember>memberList = response.jsonPath().getList("[0].members",HPMember.class);
+
+        System.out.println("memberList = " + memberList);
 
         Response response2 =
                 given().
@@ -371,16 +433,57 @@ public class HarryPotterAPI {
 
         System.out.println("members = " + memberIDs.size());
         System.out.println("characterIDs.size() = " + characterIDs.size());
-        assertEquals(memberIDs,characterIDs);
+        //assertEquals(memberIDs,characterIDs);
+
+        //with pojo
+        List<HPCharacter>hpCharactersList = response2.jsonPath().getList("",HPCharacter.class);
+
+        System.out.println("hpCharactersList = " + hpCharactersList.size());
+        System.out.println("memberList = " + memberList.size());
+        assertEquals(memberList.size(),hpCharactersList.size());
+        //5a1223ed0f5ae10021650d70 member id is forgotten to put in list
     }
 
-    //5a1223ed0f5ae10021650d70
+
 
 //    Verify house with most members
 //1. Send a get request to /houses. Request includes :
 //            • Header Accept with value application/json
-//• Query param key with value {{apiKey}}
+//              • Query param key with value {{apiKey}}
 //2. Verify status code 200, content type application/json; charset=utf-8
-//            3. Verify that Gryffindor house has the most members
+//3. Verify that Gryffindor house has the most members
+
+    @Test
+    @DisplayName("Verify house with most members")
+    public void houseWithMostMembers() {
+        Response response =
+                given().
+                        header("Accept","application/json").
+                        queryParams("key",APIKEY).
+                when().
+                        get("/houses").prettyPeek();
+
+        response.then().
+                    assertThat().
+                        statusCode(200).
+                        contentType("application/json; charset=utf-8").
+                        body("max{it.members.size()}.name",is("Gryffindor"));
+
+        //with POJO
+        List<HPHouse>houseList = response.jsonPath().getList("",HPHouse.class);
+        String houseHasTheMostMembers = "";
+        int max = 0;
+        for (HPHouse hpHouse:houseList) {
+            int sizeOFMembers = hpHouse.getMembers().size();
+            if(sizeOFMembers > max){
+             max = sizeOFMembers;
+             houseHasTheMostMembers = hpHouse.getName();
+            }
+        }
+
+        assertEquals("Gryffindor", houseHasTheMostMembers);
+
+
+    }
 
 }

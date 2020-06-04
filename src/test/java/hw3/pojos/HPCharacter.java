@@ -1,5 +1,4 @@
 package hw3.pojos;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -19,7 +18,7 @@ import com.google.gson.annotations.SerializedName;
  * }
  */
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+
 public class HPCharacter {
     @SerializedName("_id")
     private String id; //"_id": "5a0fa4daae5bc100213c232e",
