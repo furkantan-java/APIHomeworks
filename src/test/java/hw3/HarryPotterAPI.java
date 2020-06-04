@@ -2,6 +2,8 @@ package hw3;
 
 import static io.restassured.RestAssured.*;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hw3.pojos.HPCharacter;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.http.ContentType;
@@ -24,7 +26,8 @@ public class HarryPotterAPI {
     @BeforeAll
     public static void beforeAll() {
         baseURI = "https://www.potterapi.com/v1";
-        config = config().objectMapperConfig(new ObjectMapperConfig(ObjectMapperType.GSON));
+        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
     }
 
 //    Harry Potter API testing
@@ -145,8 +148,10 @@ public class HarryPotterAPI {
                             contentType("application/json; charset=utf-8").
                             body("size()",is(195));
 
-        List<Object>characterList = response.jsonPath().getList("");
+        List<HPCharacter>characterList = response.jsonPath().getList("",HPCharacter.class);
 
+        System.out.println("characterList = " + characterList);
+        
         assertTrue(characterList.size() == 195);
     }
 
@@ -362,10 +367,14 @@ public class HarryPotterAPI {
                 when().
                         get("/characters").prettyPeek();
 
-        List<String>characterIDs = response.jsonPath().getList("findAll{it.house == 'Gryffindor'}._id");
+        List<String>characterIDs = response2.jsonPath().getList("_id");
 
+        System.out.println("members = " + memberIDs.size());
+        System.out.println("characterIDs.size() = " + characterIDs.size());
         assertEquals(memberIDs,characterIDs);
     }
+
+    //5a1223ed0f5ae10021650d70
 
 //    Verify house with most members
 //1. Send a get request to /houses. Request includes :

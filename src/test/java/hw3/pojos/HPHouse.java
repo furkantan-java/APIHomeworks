@@ -1,5 +1,6 @@
 package hw3.pojos;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 
@@ -189,9 +190,9 @@ import java.util.List;
  *     ]
  * }
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class HPHouse {
     @SerializedName("_id")
-    @JsonProperty("_id")
     private String id;
     private String name;
     private String mascot;
@@ -199,7 +200,6 @@ public class HPHouse {
     private String houseGhost;
     private String founder;
     @SerializedName("__v")
-    @JsonProperty("__v")
     private Integer v;
     private String school;
     private List<HPMember> members;
